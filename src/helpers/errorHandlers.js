@@ -1,0 +1,52 @@
+const helper = {}
+
+const errorResponse =
+    (response, {
+      message,
+      name,
+      stack,
+      module = '',
+      action = '',
+      isSavedLog = true
+    }, state = 400) =>
+      response.status(state).json({ message, name, module, action, stack })
+
+const ERRORS_HANDLERS = {
+  // ----------------- ?
+  ValidationError:
+  (response, error) => errorResponse(response, error, 406),
+  // ----------------- PERSONALIZED
+  PersonalError:
+  (response, error) => errorResponse(response, error, error.statusCode),
+  // ----------------- TYPE
+  SyntaxError:
+  (response, error) => errorResponse(response, error, 400),
+  TypeError:
+  (response, error) => errorResponse(response, error, 400),
+  ReferenceError:
+  (response, error) => errorResponse(response, error, 400),
+  // ----------------- JWT
+  JsonWebTokenError:
+  (response, error) => errorResponse(response, error, 409),
+  TokenExpiredError:
+  (response, error) => errorResponse(response, error, 498),
+  // ----------------- DATABASE
+  MongooseError:
+  (response, { name, message }) =>
+    errorResponse(response, { message: 'Error database connection - ' + message, name }, 500),
+  CastError:
+  (response, error) => errorResponse(response, error),
+  // ----------------- DEFAULT
+  default:
+  (response, error) => {
+    console.error(error.name)
+    errorResponse(response, { ...error, message: 'Default error' })
+  }
+}
+
+helper.errorHandler = (error, response) => {
+  const handler = ERRORS_HANDLERS[error.name] || ERRORS_HANDLERS.default
+  handler(response, error)
+}
+
+module.exports = helper
