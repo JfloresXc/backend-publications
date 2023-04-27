@@ -39,7 +39,7 @@ const ERRORS_HANDLERS = {
   // ----------------- DEFAULT
   default:
   (response, error) => {
-    console.error(error.name)
+    console.error(error.name, error)
     errorResponse(response, { ...error, message: 'Default error' })
   }
 }
