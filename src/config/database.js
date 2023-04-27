@@ -10,11 +10,10 @@ const {
 const envs = {
   development: DATABASE_CONECTION_DEV,
   test: DATABASE_CONECTION_TEST,
-  production: DATABASE_CONECTION_PRODUCTION,
-  default: DATABASE_CONECTION_DEV
+  production: DATABASE_CONECTION_PRODUCTION
 }
 
-const URI = envs[NODE_ENV] || envs.default
+const URI = envs[NODE_ENV]
 
 mongoose
   .connect(URI, {
@@ -29,6 +28,6 @@ mongoose
     console.error(e)
   })
 
-// process.on('uncaughtException', () => {
-//   mongoose.connection.disconnect()
-// })
+process.on('uncaughtException', () => {
+  mongoose.connection.disconnect()
+})

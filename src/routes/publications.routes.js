@@ -11,7 +11,7 @@ const {
 } = require('../controllers/publications.controllers')
 
 route.get('/', verifyToken, getPublications)
-route.get('/forIdCollection/:idCollection', getPublicationForIdCollection)
+route.get('/forIdCollection/:idCollection', verifyToken, getPublicationForIdCollection)
 // route.get('/:id', verifyToken, getPublication)
 route.post('/', verifyToken, postPublication)
 route.put('/:id', verifyToken, updatePublication)
