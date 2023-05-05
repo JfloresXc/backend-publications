@@ -30,7 +30,6 @@ controller.getPublicationForIdCollection = async (req, res, next) => {
   try {
     const { idCollection } = req.params
 
-    console.log(idCollection)
     const publications = await Publication.find({ idCollection: ObjectId(idCollection) })
     res.status(200).json(publications)
   } catch (error) {
@@ -54,15 +53,14 @@ controller.getPublication = async (req, res, next) => {
 controller.postPublication = async (req, res, next) => {
   try {
     const publicationBody = req.body
+    if (!validateModel(publicationBody)) return
 
-    if (validateModel(publicationBody)) {
-      const publicationToSave = new Publication({
-        ...publicationBody,
-        idCollection: ObjectId(publicationBody.idCollection)
-      })
-      const response = await publicationToSave.save()
-      res.status(200).json(response)
-    }
+    const publicationToSave = new Publication({
+      ...publicationBody,
+      idCollection: ObjectId(publicationBody.idCollection)
+    })
+    const response = await publicationToSave.save()
+    res.status(200).json(response)
   } catch (error) {
     setConfigError(error, { action: 'POST - Create a new publication' }, next)
   }

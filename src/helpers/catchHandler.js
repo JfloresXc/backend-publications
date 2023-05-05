@@ -1,13 +1,11 @@
-let MODULE = 'NOT MODULE'
 
-const setConfigError = (error, { action }, next) => {
-  error.module = MODULE
-  error.action = action
-  next(error)
-}
+const configError = ({ module = 'NOT MODULE' }) => {
+  const setConfigError = (error, { action }, next) => {
+    error.module = module
+    error.action = action
+    next(error)
+  }
 
-const configError = ({ module }) => {
-  MODULE = module
   return { setConfigError }
 }
 

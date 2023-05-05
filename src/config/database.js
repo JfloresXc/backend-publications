@@ -1,12 +1,12 @@
 
 const mongoose = require('mongoose')
-
 const {
   NODE_ENV,
   DATABASE_CONECTION_TEST,
   DATABASE_CONECTION_PRODUCTION,
   DATABASE_CONECTION_DEV
-} = process.env
+} = require('./variablesEnv')
+
 const envs = {
   development: DATABASE_CONECTION_DEV,
   test: DATABASE_CONECTION_TEST,

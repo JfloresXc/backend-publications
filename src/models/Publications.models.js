@@ -1,4 +1,5 @@
 const { model, Schema, Types } = require('mongoose')
+const { setCustomedModel } = require('../helpers/mongooseHandler')
 
 const Publication = new Schema(
   {
@@ -21,12 +22,6 @@ const Publication = new Schema(
 
 )
 
-Publication.set('toJSON', {
-  transform: (document, object) => {
-    object.id = object._id
-    delete object._id
-    delete object.__v
-  }
-})
+setCustomedModel(Publication)
 
 module.exports = model('publications', Publication)

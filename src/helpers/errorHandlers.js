@@ -30,16 +30,18 @@ const ERRORS_HANDLERS = {
   (response, error) => errorResponse(response, error, 409),
   TokenExpiredError:
   (response, error) => errorResponse(response, error, 498),
+  Error:
+  (response, error) => errorResponse(response, error, 503),
   // ----------------- DATABASE
   MongooseError:
   (response, { name, message }) =>
-    errorResponse(response, { message: 'Error database connection - ' + message, name }, 500),
+    errorResponse(response, { message: 'Error database connection - ' + message, name }, 503),
   CastError:
   (response, error) => errorResponse(response, error),
   // ----------------- DEFAULT
   default:
   (response, error) => {
-    console.error(error.name, error)
+    console.error(error.name + ' - ', error)
     errorResponse(response, { ...error, message: 'Default error' })
   }
 }

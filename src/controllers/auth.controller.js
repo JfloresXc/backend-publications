@@ -1,38 +1,36 @@
 const { User: UserModel } = require('../models/User.model')
+const { Types: { ObjectId } } = require('mongoose')
 const jwt = require('jsonwebtoken')
-const { comparePassword } = require('../helpers/auth')
 const { configError } = require('../helpers/catchHandler')
+const { isExistUser, comparePassword, isNotExistUser } = require('../helpers/user.helper')
+const { SECRET_KEY } = require('../config/variablesEnv')
+
 const ErrorLocal = require('../utils/Error')
-const MODULE = 'AUTH'
-const { setConfigError } = configError({ module: MODULE })
+const { getPermissionsForIdRole } = require('../helpers/permission.helper')
+const { setConfigError } = configError({ module: 'AUTHENTICATION' })
 const controller = {}
 
-function validateModel ({ email, password }) {
-  if (email && password) return true
-  else {
+function validateModel ({ email, password, idRole }, isLogin = true) {
+  const isValidated = isLogin
+    ? email && password
+    : email && password && idRole
+
+  if (!isValidated) {
     throw new ErrorLocal({
-      message: 'Email or password not found',
-      statusCode: 500
+      message: 'Email or password or idRole not found',
+      statusCode: 400
     })
   }
 }
 
-const getToken = async ({ email, password }) => {
-  console.log(email, password)
-  validateModel({ email, password })
-
-  const user = await UserModel.findOne({ email })
-  if (!user) throw new ErrorLocal({ message: 'User not found', statusCode: 405 })
-
-  const isExist = comparePassword({
-    password,
-    passwordToCompare: user.password || ''
-  })
-  if (!isExist) throw new ErrorLocal({ message: 'Incorrect password', statusCode: 405 })
-
+const getToken = async ({ id, username, role }) => {
   const token = jwt.sign(
-    { idUser: user._id, username: user.username },
-    process.env.SECRET_KEY,
+    {
+      idUser: id,
+      username,
+      role: role.name
+    },
+    SECRET_KEY,
     {
       expiresIn: '7d'
     }
@@ -43,13 +41,25 @@ const getToken = async ({ email, password }) => {
 
 controller.signin = async (req, res, next) => {
   try {
-    const { email, password } = req.body
+    const body = req.body
+    const { email, password } = body
+    validateModel(body)
 
-    const { token } = await getToken({ email, password })
+    const { user } = await isExistUser({ email })
+    comparePassword({
+      password,
+      passwordToCompare: user.password || ''
+    })
+
+    const { token } = await getToken(user)
+    const permissions = await getPermissionsForIdRole({
+      idRole: user.role
+    })
 
     res.status(202).json({
       message: 'Token received',
-      token
+      token,
+      permissions
     })
   } catch (error) {
     setConfigError(error, { action: 'POST - Signin user' }, next)
@@ -58,17 +68,18 @@ controller.signin = async (req, res, next) => {
 
 controller.signup = async (req, res, next) => {
   try {
-    const { email, username = '', password } = req.body
-    if (!email || !password) throw new ErrorLocal({ message: 'User or password is empty' })
+    const body = req.body
+    const { email, password, username, idRole } = body
+    validateModel(body, false)
 
-    const user = await UserModel.findOne({ email })
-    if (user) throw new ErrorLocal({ message: 'User already created', statusCode: 405 })
+    await isNotExistUser({ email })
     if (password.length < 4) throw new ErrorLocal({ message: 'Password length is greater than 3' })
 
     const userToCreate = new UserModel({
       email,
       username,
-      password
+      password,
+      idRole: ObjectId(idRole)
     })
     await userToCreate.save()
 

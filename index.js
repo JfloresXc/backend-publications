@@ -1,7 +1,7 @@
 const dotenv = require('dotenv')
-const { app, server } = require('./src/config/server')
-
 dotenv.config()
+
+const { app, server } = require('./src/config/server')
 require('./src/config/database')
 
 process.on('uncaughtException', (err) => {

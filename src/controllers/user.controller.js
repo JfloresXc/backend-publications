@@ -1,4 +1,4 @@
-const { User: Model } = require('../models/Users.models')
+const { User: Model } = require('../models/User.model')
 const ErrorLocal = require('../utils/Error')
 const { configError } = require('../helpers/catchHandler')
 const MODULE = 'PUBLICATION'
@@ -8,8 +8,9 @@ const controller = {}
 
 controller.getUsers = async (req, res, next) => {
   try {
-    const publications = await Model.find({})
-    res.status(200).json(publications)
+    const users = await Model.find()
+      .populate('role')
+    res.status(200).json(users)
   } catch (error) {
     setConfigError(error, { action: 'GET - All publications' }, next)
   }

@@ -5,9 +5,10 @@ const cors = require('cors')
 const { errorHandler } = require('../helpers/errorHandlers')
 const path = require('path')
 const app = express()
+const { PORT = 3001 } = require('./variablesEnv')
 
 // SETTINGS
-app.set('port', process.env.PORT || 3001)
+app.set('port', PORT)
 
 // MIDLEWARES
 app.use(cors())
@@ -17,9 +18,14 @@ app.use(express.urlencoded({ extended: false }))
 app.use(fileupload())
 
 // ROUTES
-app.use('/api/publication', require('../routes/publications.routes'))
-app.use('/api/auth', require('../routes/auth.routes'))
 app.use('/api/collection', require('../routes/collection.route'))
+app.use('/api/publication', require('../routes/publications.route'))
+app.use('/api/auth', require('../routes/auth.routes'))
+app.use('/api/user', require('../routes/user.route'))
+app.use('/api/role', require('../routes/role.route'))
+app.use('/api/module', require('../routes/module.route'))
+app.use('/api/action', require('../routes/action.route'))
+app.use('/api/permission', require('../routes/permission.route'))
 app.use((error, request, response, next) => {
   errorHandler(error, response)
 })

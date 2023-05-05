@@ -1,4 +1,4 @@
-const { verifyToken } = require('../middlewares/authorization.midlewares')
+const { verifyToken, checkRole } = require('../middlewares/authorization.midlewares')
 const { Router } = require('express')
 const route = new Router()
 const {
@@ -10,7 +10,7 @@ const {
   getPublications
 } = require('../controllers/publications.controllers')
 
-route.get('/', verifyToken, getPublications)
+route.get('/', verifyToken, checkRole(['admin']), getPublications)
 route.get('/forIdCollection/:idCollection', verifyToken, getPublicationForIdCollection)
 // route.get('/:id', verifyToken, getPublication)
 route.post('/', verifyToken, postPublication)

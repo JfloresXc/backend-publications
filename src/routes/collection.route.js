@@ -1,4 +1,4 @@
-const { verifyToken } = require('../middlewares/authorization.midlewares')
+const { verifyToken, checkRole } = require('../middlewares/authorization.midlewares')
 const { Router } = require('express')
 const route = new Router()
 const {
@@ -7,7 +7,7 @@ const {
   getCollections
 } = require('../controllers/collection.controllers')
 
-route.get('/', verifyToken, getCollections)
+route.get('/', verifyToken, checkRole('001', '1'), getCollections)
 route.get('/:id', verifyToken, getCollection)
 route.post('/', verifyToken, postCollection)
 
