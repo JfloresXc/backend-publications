@@ -28,7 +28,7 @@ const getToken = async ({ id, username, role }) => {
     {
       idUser: id,
       username,
-      role: role.name
+      role
     },
     SECRET_KEY,
     {
