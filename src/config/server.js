@@ -26,6 +26,8 @@ app.use('/api/role', require('../routes/role.route'))
 app.use('/api/module', require('../routes/module.route'))
 app.use('/api/action', require('../routes/action.route'))
 app.use('/api/permission', require('../routes/permission.route'))
+app.use('/api/patient', require('../routes/patient.route'))
+app.use('/api/citation', require('../routes/citation.route'))
 app.use((error, request, response, next) => {
   errorHandler(error, response)
 })
