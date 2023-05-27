@@ -9,7 +9,7 @@ const errorResponse =
       action = '',
       isSavedLog = true
     }, state = 400) =>
-      response.status(state).json({ message, name, module, action, stack })
+      response.status(state).json({ message, name, module, action, stack, isError: true })
 
 const ERRORS_HANDLERS = {
   // ----------------- ?

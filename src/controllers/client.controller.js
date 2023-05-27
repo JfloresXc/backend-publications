@@ -1,32 +1,31 @@
-const { Patient: Model } = require('../models/Patient.model')
-const { Types: { ObjectId } } = require('mongoose')
+const { Client: Model } = require('../models/Client.model')
 const ErrorLocal = require('../utils/Error')
 const { configError } = require('../helpers/catchHandler')
-const MODULE = 'PUBLICATION'
+const MODULE = 'CLIENT'
 const { setConfigError } = configError({ module: MODULE })
 const { isSomeEmptyFromModel } = require('../helpers/validations')
 
 const controller = {}
 
-controller.getPatients = async (req, res, next) => {
+controller.getClients = async (req, res, next) => {
   try {
-    const patients = await Model.find({})
-    res.status(200).json(patients)
+    const clients = await Model.find({})
+    res.status(200).json(clients)
   } catch (error) {
-    setConfigError(error, { action: 'GET - All patients' }, next)
+    setConfigError(error, { action: 'GET - All clients' }, next)
   }
 }
 
-controller.getPatient = async (req, res, next) => {
+controller.getClient = async (req, res, next) => {
   try {
     const { id } = req.params
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
 
-    const patient = await Model.findById(id)
-    res.json(patient)
+    const client = await Model.findById(id)
+    res.json(client)
   } catch (error) {
-    setConfigError(error, { action: 'GET - One Patient for id' }, next)
+    setConfigError(error, { action: 'GET - One Client for id' }, next)
   }
 }
 
@@ -36,7 +35,7 @@ controller.postModel = async (req, res, next) => {
     const { name, surname, birthdate, dni, email, phone } = body
 
     isSomeEmptyFromModel([name, surname, birthdate, dni, phone])
-    const patientToSave = new Model({
+    const clientToSave = new Model({
       name,
       surname,
       birthdate,
@@ -44,10 +43,10 @@ controller.postModel = async (req, res, next) => {
       email,
       phone
     })
-    const response = await patientToSave.save()
+    const response = await clientToSave.save()
     res.status(200).json(response)
   } catch (error) {
-    setConfigError(error, { action: 'POST - Create a new patient' }, next)
+    setConfigError(error, { action: 'POST - Create a new client' }, next)
   }
 }
 
@@ -71,25 +70,25 @@ controller.updateModel = async (req, res, next) => {
     }, { new: true })
     res.status(200).json(response)
   } catch (error) {
-    setConfigError(error, { action: 'PUT - Update a patient for id' }, next)
+    setConfigError(error, { action: 'PUT - Update a client for id' }, next)
   }
 }
 
-controller.deletePatient = async (req, res, next) => {
+controller.deleteClient = async (req, res, next) => {
   try {
     const { id } = req.params
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
 
-    const deletedPatient = await Model.findByIdAndDelete(id)
+    const deletedClient = await Model.findByIdAndDelete(id)
 
-    if (!deletedPatient) {
-      throw new ErrorLocal({ message: 'Patient not found', statusCode: 400 })
+    if (!deletedClient) {
+      throw new ErrorLocal({ message: 'Client not found', statusCode: 400 })
     }
 
     res.status(200).json({ message: 'Eliminado satisfactoriamente' })
   } catch (error) {
-    setConfigError(error, { action: 'DELETE - A patient for id' }, next)
+    setConfigError(error, { action: 'DELETE - A client for id' }, next)
   }
 }
 

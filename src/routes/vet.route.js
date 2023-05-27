@@ -2,17 +2,17 @@ const { verifyToken, checkRole } = require('../middlewares/authorization.midlewa
 const { Router } = require('express')
 const route = new Router()
 const {
-  getPatients,
-  getPatient,
+  deleteVet,
+  getVet,
+  getVets,
   postModel,
-  updateModel,
-  deletePatient
-} = require('../controllers/patient.controller')
+  updateModel
+} = require('../controllers/vet.controller')
 
-route.get('/', verifyToken, checkRole('001', '1'), getPatients)
-route.get('/:id', verifyToken, checkRole('001', '1'), getPatient)
+route.get('/', verifyToken, checkRole('001', '1'), getVets)
+route.get('/:id', verifyToken, checkRole('001', '1'), getVet)
 route.post('/', verifyToken, checkRole('001', '1'), postModel)
 route.put('/:id', verifyToken, checkRole('001', '1'), updateModel)
-route.delete('/:id', verifyToken, checkRole('001', '1'), deletePatient)
+route.delete('/:id', verifyToken, checkRole('001', '1'), deleteVet)
 
 module.exports = route

@@ -38,4 +38,4 @@ const ModelSchema = new Schema(
 
 setCustomedModel(ModelSchema)
 
-module.exports = { Patient: model('Patient', ModelSchema) }
+module.exports = { Vet: model('Vet', ModelSchema) }

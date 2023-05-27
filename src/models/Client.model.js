@@ -3,38 +3,30 @@ const { setCustomedModel } = require('../helpers/mongooseHandler')
 
 const ModelSchema = new Schema(
   {
-    speciality: {
+    name: {
       type: String,
       required: true
     },
-    description: {
+    surname: {
       type: String,
       required: true
     },
-    reasonOfCitation: {
-      type: String,
-      required: true
-    },
-    dateOfAttention: {
+    birthdate: {
       type: Date,
       required: true
     },
-    hourOfAttention: {
+    dni: {
+      type: String,
+      required: true,
+      minlength: 8,
+      unique: true
+    },
+    email: {
       type: String,
       required: true
     },
-    state: {
+    phone: {
       type: String,
-      default: 'PENDING'
-    },
-    pet: {
-      type: Schema.Types.ObjectId,
-      ref: 'Pet',
-      required: true
-    },
-    vet: {
-      type: Schema.Types.ObjectId,
-      ref: 'Vet',
       required: true
     }
   },
@@ -46,4 +38,4 @@ const ModelSchema = new Schema(
 
 setCustomedModel(ModelSchema)
 
-module.exports = { Citation: model('Citation', ModelSchema) }
+module.exports = { Client: model('Client', ModelSchema) }
