@@ -1,4 +1,5 @@
 const { Pet: Model } = require('../models/Pet.model')
+const { Types: { ObjectId } } = require('mongoose')
 const ErrorLocal = require('../utils/Error')
 const { configError } = require('../helpers/catchHandler')
 const MODULE = 'PET'
@@ -9,7 +10,7 @@ const controller = {}
 
 controller.getPets = async (req, res, next) => {
   try {
-    const pets = await Model.find({})
+    const pets = await Model.find().populate('client')
     res.status(200).json(pets)
   } catch (error) {
     setConfigError(error, { action: 'GET - All pets' }, next)
@@ -32,13 +33,36 @@ controller.getPet = async (req, res, next) => {
 controller.postPet = async (req, res, next) => {
   try {
     const body = req.body
-    const { name, surname, birthdate } = body
+    const {
+      name,
+      surname,
+      birthdate,
+      specie,
+      breed,
+      weight,
+      medicalInformation,
+      address,
+      idClient
+    } = body
 
-    isSomeEmptyFromModel([name, surname, birthdate])
+    isSomeEmptyFromModel([
+      name,
+      surname,
+      birthdate,
+      weight,
+      address,
+      idClient
+    ])
     const petToSave = new Model({
       name,
       surname,
-      birthdate
+      birthdate,
+      specie,
+      breed,
+      weight,
+      medicalInformation,
+      address,
+      client: ObjectId(idClient)
     })
     const response = await petToSave.save()
     res.status(200).json(response)
@@ -51,16 +75,39 @@ controller.updatePet = async (req, res, next) => {
   try {
     const { id } = req.params
     const body = req.body
-    const { name, surname, birthdate } = body
+    const {
+      name,
+      surname,
+      birthdate,
+      specie,
+      breed,
+      weight,
+      medicalInformation,
+      address,
+      idClient
+    } = body
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
 
-    isSomeEmptyFromModel([name, surname, birthdate])
+    isSomeEmptyFromModel([
+      name,
+      surname,
+      birthdate,
+      weight,
+      address,
+      idClient
+    ])
 
     const response = await Model.findByIdAndUpdate(id, {
       name,
       surname,
-      birthdate
+      birthdate,
+      specie,
+      breed,
+      weight,
+      medicalInformation,
+      address,
+      client: ObjectId(idClient)
     }, { new: true })
     res.status(200).json(response)
   } catch (error) {

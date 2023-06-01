@@ -11,7 +11,8 @@ const controller = {}
 controller.getCitations = async (req, res, next) => {
   try {
     const citations = await Model.find({})
-      .populate('pet').populate('vet')
+      .populate('pet')
+      .populate('vet')
     res.status(200).json(citations)
   } catch (error) {
     setConfigError(error, { action: 'GET - All citations' }, next)

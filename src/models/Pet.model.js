@@ -1,4 +1,4 @@
-const { model, Schema } = require('mongoose')
+const { model, Schema, Types } = require('mongoose')
 const { setCustomedModel } = require('../helpers/mongooseHandler')
 
 const ModelSchema = new Schema(
@@ -13,6 +13,29 @@ const ModelSchema = new Schema(
     },
     birthdate: {
       type: Date
+    },
+    specie: { // Especie
+      type: String
+    },
+    breed: { // Raza
+      type: String
+    },
+    weight: {
+      type: Number,
+      required: true
+    },
+    medicalInformation: {
+      type: String,
+      default: ''
+    },
+    address: {
+      type: String,
+      default: ''
+    },
+    client: {
+      type: Types.ObjectId,
+      ref: 'Client',
+      required: true
     }
   },
   {

@@ -14,7 +14,7 @@ controller.postPermission = async (req, res, next) => {
     if (isSomeEmptyFromModel([codeModule, codeAction, idRole])) return
 
     const permissionSave = new Model({
-      codeModule, codeAction, idRole: ObjectId(idRole)
+      codeModule, codeAction, role: ObjectId(idRole)
     })
     const response = await permissionSave.save()
     res.status(200).json(response)
