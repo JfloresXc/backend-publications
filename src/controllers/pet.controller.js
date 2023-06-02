@@ -23,7 +23,7 @@ controller.getPet = async (req, res, next) => {
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
 
-    const pet = await Model.findById(id)
+    const pet = await Model.findById(id).populate('client')
     res.json(pet)
   } catch (error) {
     setConfigError(error, { action: 'GET - One Pet for id' }, next)
