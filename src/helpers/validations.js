@@ -11,7 +11,7 @@ const isSomeEmptyFromModel = (values = []) => {
 
   if (!isMajorToZero || thereIsEmpties) {
     throw new ErrorLocal({
-      message: 'Any not found',
+      message: 'Some values are empty',
       statusCode: 400
     })
   }

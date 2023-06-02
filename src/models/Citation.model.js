@@ -24,8 +24,8 @@ const ModelSchema = new Schema(
       required: true
     },
     state: {
-      type: String,
-      default: 'PENDING'
+      type: Number,
+      default: 1
     },
     pet: {
       type: Schema.Types.ObjectId,

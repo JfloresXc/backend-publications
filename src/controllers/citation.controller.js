@@ -26,7 +26,8 @@ controller.getCitation = async (req, res, next) => {
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
 
     const citation = await Model.findById(id)
-      .populate('pet').populate('vet')
+      .populate('pet')
+      .populate('vet')
     res.json(citation)
   } catch (error) {
     setConfigError(error, { action: 'GET - One Citation for id' }, next)
@@ -43,8 +44,7 @@ controller.postModel = async (req, res, next) => {
       dateOfAttention,
       hourOfAttention,
       idPet,
-      idVet,
-      state
+      idVet
     } = body
 
     isSomeEmptyFromModel([
@@ -63,7 +63,7 @@ controller.postModel = async (req, res, next) => {
       reasonOfCitation,
       dateOfAttention,
       hourOfAttention,
-      state,
+      state: 1,
       pet: ObjectId(idPet),
       vet: ObjectId(idVet)
     })
@@ -114,6 +114,25 @@ controller.updateModel = async (req, res, next) => {
     res.status(200).json(response)
   } catch (error) {
     setConfigError(error, { action: 'PUT - Update a citation for id' }, next)
+  }
+}
+
+controller.updateState = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const { state } = req.body
+
+    if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
+    isSomeEmptyFromModel([
+      state
+    ])
+
+    const response = await Model.findByIdAndUpdate(id, {
+      state
+    }, { new: true })
+    res.status(200).json(response)
+  } catch (error) {
+    setConfigError(error, { action: 'PUT - Update state citation' }, next)
   }
 }
 
