@@ -5,6 +5,8 @@ const { configError } = require('../helpers/catchHandler')
 const MODULE = 'CITATION'
 const { setConfigError } = configError({ module: MODULE })
 const { isSomeEmptyFromModel } = require('../helpers/validations')
+const { addNewCitation, editCitation } = require('../helpers/citation.helper')
+const { compareDates } = require('../utils/date')
 
 const controller = {}
 
@@ -34,6 +36,32 @@ controller.getCitation = async (req, res, next) => {
   }
 }
 
+controller.validateDateOfAttetion = async (req, res, next) => {
+  try {
+    const { id, dateOfAttention, hourOfAttention } = req.params
+
+    const citations = await Model.find({})
+
+    const citationFinded = citations.find(citation => {
+      if (citation._id.toString() === id) return false
+      const dateOne = new Date(citation.dateOfAttention)
+      const dateTwo = new Date(dateOfAttention)
+      const hourOne = citation.hourOfAttention
+      const hourTwo = hourOfAttention
+
+      return compareDates(dateOne, dateTwo) && hourOne === hourTwo
+    })
+
+    if (citationFinded) {
+      throw new ErrorLocal({ message: 'The date and time of the appointment is occupied', statusCode: 400 })
+    }
+
+    res.status(200).json({ message: 'The date and time of the appointment is available' })
+  } catch (error) {
+    setConfigError(error, { action: 'GET - One Citation for id' }, next)
+  }
+}
+
 controller.postModel = async (req, res, next) => {
   try {
     const body = req.body
@@ -49,7 +77,6 @@ controller.postModel = async (req, res, next) => {
 
     isSomeEmptyFromModel([
       speciality,
-      description,
       reasonOfCitation,
       dateOfAttention,
       hourOfAttention,
@@ -57,17 +84,20 @@ controller.postModel = async (req, res, next) => {
       idVet
     ])
 
-    const citationToSave = new Model({
-      speciality,
-      description,
-      reasonOfCitation,
-      dateOfAttention,
-      hourOfAttention,
-      state: 1,
-      pet: ObjectId(idPet),
-      vet: ObjectId(idVet)
-    })
-    const response = await citationToSave.save()
+    const response = await addNewCitation(
+      {
+        citation: {
+          speciality,
+          description,
+          reasonOfCitation,
+          dateOfAttention,
+          hourOfAttention,
+          state: 1,
+          pet: ObjectId(idPet),
+          vet: ObjectId(idVet)
+        }
+      }
+    )
     res.status(200).json(response)
   } catch (error) {
     setConfigError(error, { action: 'POST - Create a new citation' }, next)
@@ -93,7 +123,6 @@ controller.updateModel = async (req, res, next) => {
 
     isSomeEmptyFromModel([
       speciality,
-      description,
       reasonOfCitation,
       dateOfAttention,
       hourOfAttention,
@@ -101,19 +130,52 @@ controller.updateModel = async (req, res, next) => {
       idVet
     ])
 
-    const response = await Model.findByIdAndUpdate(id, {
-      speciality,
-      description,
-      reasonOfCitation,
-      dateOfAttention,
-      hourOfAttention,
-      state,
-      pet: ObjectId(idPet),
-      vet: ObjectId(idVet)
-    }, { new: true })
+    const response = await editCitation({
+      citation: {
+        speciality,
+        description,
+        reasonOfCitation,
+        dateOfAttention,
+        hourOfAttention,
+        state,
+        pet: ObjectId(idPet),
+        vet: ObjectId(idVet)
+      },
+      id
+    })
     res.status(200).json(response)
   } catch (error) {
     setConfigError(error, { action: 'PUT - Update a citation for id' }, next)
+  }
+}
+
+controller.rescheduleCitation = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
+
+    const citation = await Model.findById(id)
+    if (!citation) throw new ErrorLocal({ message: 'Citation not found', statusCode: 400 })
+
+    const citationNew = { ...citation._doc }
+    delete citationNew._id
+    delete citationNew.id
+    citationNew.reprogrammedCitationFather = id
+
+    const response = await addNewCitation({ citation: citationNew })
+
+    await editCitation({
+      citation: {
+        reprogrammedCitationSon: response.id,
+        state: 4
+      },
+      id
+    })
+
+    res.status(200).json(response)
+  } catch (error) {
+    setConfigError(error, { action: 'PUT - Clone a citation and change the state of the original citation' }, next)
   }
 }
 

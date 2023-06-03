@@ -8,8 +8,7 @@ const ModelSchema = new Schema(
       required: true
     },
     description: {
-      type: String,
-      required: true
+      type: String
     },
     reasonOfCitation: {
       type: String,
@@ -26,6 +25,14 @@ const ModelSchema = new Schema(
     state: {
       type: Number,
       default: 1
+    },
+    reprogrammedCitationSon: {
+      type: String,
+      default: '-1'
+    },
+    reprogrammedCitationFather: {
+      type: String,
+      default: '-1'
     },
     pet: {
       type: Schema.Types.ObjectId,
