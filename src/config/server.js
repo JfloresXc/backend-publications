@@ -30,6 +30,7 @@ app.use('/api/client', require('../routes/client.route'))
 app.use('/api/citation', require('../routes/citation.route'))
 app.use('/api/pet', require('../routes/pet.route'))
 app.use('/api/vet', require('../routes/vet.route'))
+app.use('/api/service', require('../routes/service.route'))
 app.use((error, request, response, next) => {
   errorHandler(error, response)
 })

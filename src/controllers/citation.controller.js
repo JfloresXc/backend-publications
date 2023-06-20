@@ -1,5 +1,7 @@
 const { Citation: Model } = require('../models/Citation.model')
-const { Types: { ObjectId } } = require('mongoose')
+const {
+  Types: { ObjectId },
+} = require('mongoose')
 const ErrorLocal = require('../utils/Error')
 const { configError } = require('../helpers/catchHandler')
 const MODULE = 'CITATION'
@@ -12,9 +14,7 @@ const controller = {}
 
 controller.getCitations = async (req, res, next) => {
   try {
-    const citations = await Model.find({})
-      .populate('pet')
-      .populate('vet')
+    const citations = await Model.find({}).populate('pet').populate('vet')
     res.status(200).json(citations)
   } catch (error) {
     setConfigError(error, { action: 'GET - All citations' }, next)
@@ -27,9 +27,7 @@ controller.getCitation = async (req, res, next) => {
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
 
-    const citation = await Model.findById(id)
-      .populate('pet')
-      .populate('vet')
+    const citation = await Model.findById(id).populate('pet').populate('vet')
     res.json(citation)
   } catch (error) {
     setConfigError(error, { action: 'GET - One Citation for id' }, next)
@@ -42,21 +40,27 @@ controller.validateDateOfAttetion = async (req, res, next) => {
 
     const citations = await Model.find({})
 
-    const citationFinded = citations.find(citation => {
+    const citationFinded = citations.find((citation) => {
       if (citation._id.toString() === id) return false
       const dateOne = new Date(citation.dateOfAttention)
       const dateTwo = new Date(dateOfAttention)
       const hourOne = citation.hourOfAttention
       const hourTwo = hourOfAttention
 
+      console.log(hourOne, hourTwo)
       return compareDates(dateOne, dateTwo) && hourOne === hourTwo
     })
 
     if (citationFinded) {
-      throw new ErrorLocal({ message: 'The date and time of the appointment is occupied', statusCode: 400 })
+      throw new ErrorLocal({
+        message: 'The date and time of the appointment is occupied',
+        statusCode: 400,
+      })
     }
 
-    res.status(200).json({ message: 'The date and time of the appointment is available' })
+    res
+      .status(200)
+      .json({ message: 'The date and time of the appointment is available' })
   } catch (error) {
     setConfigError(error, { action: 'GET - One Citation for id' }, next)
   }
@@ -72,7 +76,7 @@ controller.postModel = async (req, res, next) => {
       dateOfAttention,
       hourOfAttention,
       idPet,
-      idVet
+      idVet,
     } = body
 
     isSomeEmptyFromModel([
@@ -81,23 +85,21 @@ controller.postModel = async (req, res, next) => {
       dateOfAttention,
       hourOfAttention,
       idPet,
-      idVet
+      idVet,
     ])
 
-    const response = await addNewCitation(
-      {
-        citation: {
-          speciality,
-          description,
-          reasonOfCitation,
-          dateOfAttention,
-          hourOfAttention,
-          state: 1,
-          pet: ObjectId(idPet),
-          vet: ObjectId(idVet)
-        }
-      }
-    )
+    const response = await addNewCitation({
+      citation: {
+        speciality,
+        description,
+        reasonOfCitation,
+        dateOfAttention,
+        hourOfAttention,
+        state: 1,
+        pet: ObjectId(idPet),
+        vet: ObjectId(idVet),
+      },
+    })
     res.status(200).json(response)
   } catch (error) {
     setConfigError(error, { action: 'POST - Create a new citation' }, next)
@@ -116,7 +118,7 @@ controller.updateModel = async (req, res, next) => {
       hourOfAttention,
       idPet,
       idVet,
-      state
+      state,
     } = body
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
@@ -127,7 +129,7 @@ controller.updateModel = async (req, res, next) => {
       dateOfAttention,
       hourOfAttention,
       idPet,
-      idVet
+      idVet,
     ])
 
     const response = await editCitation({
@@ -139,9 +141,9 @@ controller.updateModel = async (req, res, next) => {
         hourOfAttention,
         state,
         pet: ObjectId(idPet),
-        vet: ObjectId(idVet)
+        vet: ObjectId(idVet),
       },
-      id
+      id,
     })
     res.status(200).json(response)
   } catch (error) {
@@ -156,7 +158,8 @@ controller.rescheduleCitation = async (req, res, next) => {
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
 
     const citation = await Model.findById(id)
-    if (!citation) throw new ErrorLocal({ message: 'Citation not found', statusCode: 400 })
+    if (!citation)
+      throw new ErrorLocal({ message: 'Citation not found', statusCode: 400 })
 
     const citationNew = { ...citation._doc }
     delete citationNew._id
@@ -168,14 +171,21 @@ controller.rescheduleCitation = async (req, res, next) => {
     await editCitation({
       citation: {
         reprogrammedCitationSon: response.id,
-        state: 4
+        state: 4,
       },
-      id
+      id,
     })
 
     res.status(200).json(response)
   } catch (error) {
-    setConfigError(error, { action: 'PUT - Clone a citation and change the state of the original citation' }, next)
+    setConfigError(
+      error,
+      {
+        action:
+          'PUT - Clone a citation and change the state of the original citation',
+      },
+      next
+    )
   }
 }
 
@@ -185,13 +195,15 @@ controller.updateState = async (req, res, next) => {
     const { state } = req.body
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
-    isSomeEmptyFromModel([
-      state
-    ])
+    isSomeEmptyFromModel([state])
 
-    const response = await Model.findByIdAndUpdate(id, {
-      state
-    }, { new: true })
+    const response = await Model.findByIdAndUpdate(
+      id,
+      {
+        state,
+      },
+      { new: true }
+    )
     res.status(200).json(response)
   } catch (error) {
     setConfigError(error, { action: 'PUT - Update state citation' }, next)

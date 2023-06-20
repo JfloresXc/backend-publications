@@ -1,0 +1,18 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["standard", "plugin:react/recommended", "eslint-config-prettier"],
+  "overrides": [],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "plugins": ["react"],
+  "rules": {
+    "react/react-in-jsx-scope": 0,
+    "react/prop-types": 0,
+    "react/no-unknown-property": 0
+  }
+}
