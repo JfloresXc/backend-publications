@@ -27,7 +27,10 @@ controller.getCitation = async (req, res, next) => {
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
 
-    const citation = await Model.findById(id).populate('pet').populate('vet')
+    const citation = await Model.findById(id)
+      .populate('pet')
+      .populate('vet')
+      .populate('services')
     res.json(citation)
   } catch (error) {
     setConfigError(error, { action: 'GET - One Citation for id' }, next)
@@ -47,7 +50,6 @@ controller.validateDateOfAttetion = async (req, res, next) => {
       const hourOne = citation.hourOfAttention
       const hourTwo = hourOfAttention
 
-      console.log(hourOne, hourTwo)
       return compareDates(dateOne, dateTwo) && hourOne === hourTwo
     })
 
@@ -77,6 +79,7 @@ controller.postModel = async (req, res, next) => {
       hourOfAttention,
       idPet,
       idVet,
+      services,
     } = body
 
     isSomeEmptyFromModel([
@@ -86,7 +89,15 @@ controller.postModel = async (req, res, next) => {
       hourOfAttention,
       idPet,
       idVet,
+      services,
     ])
+
+    const servicesToSave = []
+    if (services?.length > 0) {
+      services.forEach((idService) => {
+        servicesToSave.push(ObjectId(idService))
+      })
+    }
 
     const response = await addNewCitation({
       citation: {
@@ -98,6 +109,7 @@ controller.postModel = async (req, res, next) => {
         state: 1,
         pet: ObjectId(idPet),
         vet: ObjectId(idVet),
+        services: servicesToSave,
       },
     })
     res.status(200).json(response)
@@ -119,6 +131,7 @@ controller.updateModel = async (req, res, next) => {
       idPet,
       idVet,
       state,
+      services,
     } = body
 
     if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
@@ -132,6 +145,13 @@ controller.updateModel = async (req, res, next) => {
       idVet,
     ])
 
+    const servicesToSave = []
+    if (services?.length > 0) {
+      services.forEach((idService) => {
+        servicesToSave.push(ObjectId(idService))
+      })
+    }
+
     const response = await editCitation({
       citation: {
         speciality,
@@ -142,6 +162,7 @@ controller.updateModel = async (req, res, next) => {
         state,
         pet: ObjectId(idPet),
         vet: ObjectId(idVet),
+        services: servicesToSave,
       },
       id,
     })

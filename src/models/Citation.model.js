@@ -5,50 +5,50 @@ const ModelSchema = new Schema(
   {
     speciality: {
       type: String,
-      required: true
+      required: true,
     },
     description: {
-      type: String
+      type: String,
     },
     reasonOfCitation: {
       type: String,
-      required: true
+      required: true,
     },
     dateOfAttention: {
       type: Date,
-      required: true
+      required: true,
     },
     hourOfAttention: {
       type: String,
-      required: true
+      required: true,
     },
     state: {
       type: Number,
-      default: 1
+      default: 1,
     },
     reprogrammedCitationSon: {
       type: String,
-      default: '-1'
+      default: '-1',
     },
     reprogrammedCitationFather: {
       type: String,
-      default: '-1'
+      default: '-1',
     },
     pet: {
       type: Schema.Types.ObjectId,
       ref: 'Pet',
-      required: true
+      required: true,
     },
     vet: {
       type: Schema.Types.ObjectId,
       ref: 'Vet',
-      required: true
-    }
+      required: true,
+    },
+    services: [{ type: Schema.Types.ObjectId, ref: 'Service' }],
   },
   {
-    timestamps: true
+    timestamps: true,
   }
-
 )
 
 setCustomedModel(ModelSchema)

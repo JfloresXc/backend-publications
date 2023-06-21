@@ -9,7 +9,7 @@ const controller = {}
 
 controller.getServices = async (req, res, next) => {
   try {
-    const services = await Model.find()
+    const services = await Model.find().populate('services')
     res.status(200).json(services)
   } catch (error) {
     setConfigError(error, { action: 'GET - All services' }, next)
