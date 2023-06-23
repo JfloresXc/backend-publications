@@ -14,7 +14,13 @@ const controller = {}
 
 controller.getCitations = async (req, res, next) => {
   try {
-    const citations = await Model.find({}).populate('pet').populate('vet')
+    const query = {}
+    if (req.query.idPet) query.pet = req.query.idPet
+
+    const citations = await Model.find(query)
+      .populate('pet')
+      .populate('vet')
+      .populate('services')
     res.status(200).json(citations)
   } catch (error) {
     setConfigError(error, { action: 'GET - All citations' }, next)
@@ -228,6 +234,27 @@ controller.updateState = async (req, res, next) => {
     res.status(200).json(response)
   } catch (error) {
     setConfigError(error, { action: 'PUT - Update state citation' }, next)
+  }
+}
+
+controller.updateDescription = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const { description } = req.body
+
+    if (!id) throw new ErrorLocal({ message: 'Id not found', statusCode: 400 })
+    isSomeEmptyFromModel([description])
+
+    const response = await Model.findByIdAndUpdate(
+      id,
+      {
+        description,
+      },
+      { new: true }
+    )
+    res.status(200).json(response)
+  } catch (error) {
+    setConfigError(error, { action: 'PUT - Update description citation' }, next)
   }
 }
 

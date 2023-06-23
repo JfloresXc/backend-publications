@@ -13,6 +13,7 @@ const {
   updateState,
   rescheduleCitation,
   validateDateOfAttetion,
+  updateDescription,
 } = require('../controllers/citation.controller')
 
 route.get('/', verifyToken, checkRole('001', '1'), getCitations)
@@ -26,6 +27,12 @@ route.get(
 route.post('/', verifyToken, checkRole('001', '1'), postModel)
 route.put('/:id', verifyToken, checkRole('001', '1'), updateModel)
 route.put('/state/:id', verifyToken, checkRole('001', '1'), updateState)
+route.put(
+  '/description/:id',
+  verifyToken,
+  checkRole('001', '1'),
+  updateDescription
+)
 route.put(
   '/reschedule/:id',
   verifyToken,
