@@ -9,7 +9,6 @@ const SchemaModel = new Schema(
     },
     description: {
       type: String,
-      unique: true,
     },
     duration: {
       type: String,
